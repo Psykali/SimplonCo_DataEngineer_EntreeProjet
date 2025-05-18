@@ -390,15 +390,6 @@ graph TD
 - **Time Series Module** (`timeseries_analysis.py`)  
 - **Dashboard Service** (`dashboard.py`, port `8501`)  
 
----
-
-## 📦 Additional Deliverables
-- [x] **Time series script** (`ARIMA`, `Prophet`)  
-- [x] **Streamlit application** (`dashboard.py`)  
-- [x] **Exportable forecasts** (CSV/JSON)  
-- [x] **Updated ERD** with forecast history tables  
-
----
 
 ## 🔍 Additional Insights
 1. **Seasonality**: Weekend sales peak (+18% vs weekdays)  
