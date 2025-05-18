@@ -3,12 +3,10 @@ import requests
 import pandas as pd
 from datetime import datetime
 
-# Database setup
 def setup_database():
     conn = sqlite3.connect('data/sales.db')
     cursor = conn.cursor()
     
-    # Create tables
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY,
@@ -53,42 +51,21 @@ def setup_database():
     conn.commit()
     return conn
 
-# Data import functions
-def import_products(conn, url):
+def import_data(conn, url, table_name):
     response = requests.get(url)
     data = response.json()
     df = pd.DataFrame(data)
     
-    # Check for existing records
-    existing = pd.read_sql('SELECT id FROM products', conn)
+    existing = pd.read_sql(f'SELECT id FROM {table_name}', conn)
     new_records = df[~df['id'].isin(existing['id'])]
     
     if not new_records.empty:
-        new_records.to_sql('products', conn, if_exists='append', index=False)
-        print(f"Imported {len(new_records)} new product records")
+        new_records.to_sql(table_name, conn, if_exists='append', index=False)
+        print(f"Imported {len(new_records)} new records to {table_name}.")
     else:
-        print("No new product records to import")
+        print(f"No new data to import to {table_name}.")
 
-def import_sales(conn, url):
-    response = requests.get(url)
-    data = response.json()
-    df = pd.DataFrame(data)
-    
-    # Convert date format if needed
-    df['sale_date'] = pd.to_datetime(df['sale_date']).dt.strftime('%Y-%m-%d')
-    
-    # Check for existing records
-    existing = pd.read_sql('SELECT id FROM sales', conn)
-    new_records = df[~df['id'].isin(existing['id'])]
-    
-    if not new_records.empty:
-        new_records.to_sql('sales', conn, if_exists='append', index=False)
-        print(f"Imported {len(new_records)} new sales records")
-    else:
-        print("No new sales records to import")
-
-# Analysis functions
-def run_sales_analysis(conn):
+def run_analysis(conn):
     cursor = conn.cursor()
     
     # Total revenue
@@ -113,13 +90,13 @@ def run_sales_analysis(conn):
     ORDER BY total_sales DESC
     ''', conn)
     
-    # Store results
+    # Save results
     now = datetime.now().isoformat()
     cursor.execute('''
     INSERT INTO analysis_results 
     (analysis_type, result_value, result_details, created_at)
     VALUES (?, ?, ?, ?)
-    ''', ('total_revenue', total_revenue, 'Overall revenue', now))
+    ''', ('total_revenue', total_revenue, 'Total revenue', now))
     
     conn.commit()
     
@@ -130,16 +107,9 @@ def run_sales_analysis(conn):
     }
 
 if __name__ == '__main__':
-    # Initialize database
     conn = setup_database()
-    
-    # Import data (replace with actual URLs)
-    import_products(conn, 'http://example.com/products.csv')
-    import_sales(conn, 'http://example.com/sales.csv')
-    
-    # Run analysis
-    results = run_sales_analysis(conn)
-    print("Analysis Results:")
-    print(results)
-    
+    import_data(conn, 'http://example.com/products.csv', 'products')
+    import_data(conn, 'http://example.com/sales.csv', 'sales')
+    results = run_analysis(conn)
+    print("Analysis Results:", results)
     conn.close()
