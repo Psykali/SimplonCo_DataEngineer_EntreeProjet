@@ -1,5 +1,4 @@
-# SimplonCo_DataEngineer_EntreeProjet
-# Data Engineer Project: Sales Analysis for a SME
+# SimplonCo_DataEngineer Project: Sales Analysis for a SME
 
 ## Project Overview
 This project involves creating a two-service architecture to analyze sales data for a small-to-medium enterprise (SME). The goal is to help the client understand sales dynamics over time and across regions to improve strategic decision-making.
