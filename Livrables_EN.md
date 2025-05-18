@@ -385,13 +385,3 @@ graph TD
     C -->|Forecasts| D[Streamlit Dashboard]
     D -->|Visualization| E[Business Users]
 ```
-
-### New Components
-- **Time Series Module** (`timeseries_analysis.py`)  
-- **Dashboard Service** (`dashboard.py`, port `8501`)  
-
-
-## 🔍 Additional Insights
-1. **Seasonality**: Weekend sales peak (+18% vs weekdays)  
-2. **High-Potential Region**: Occitanie (+22% monthly growth)  
-3. **Underperforming Product**: "Add-on Module A" (below target)  
