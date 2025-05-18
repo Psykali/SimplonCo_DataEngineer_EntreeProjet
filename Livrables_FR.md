@@ -279,3 +279,109 @@ JOIN stores st ON s.store_id = st.id
 GROUP BY st.region
 ORDER BY total_sales DESC;
 ```
+
+## Analyses Avancées
+---
+
+## **📊 Tableau de Bord de Visualisation (Power BI/Streamlit)**  
+
+### **1. Métriques Clés à Afficher**  
+| **Widget**               | **Description**                                  | **Source Data**              |  
+|--------------------------|------------------------------------------------|-----------------------------|  
+| **CA Total**             | Chiffre d'affaires global                      | `SUM(sales.amount)`         |  
+| **Top 5 Produits**       | Produits les plus vendus (graphique barres)    | `JOIN products + GROUP BY`  |  
+| **Ventes par Région**    | Carte de France interactive (heatmap)          | `stores.region + sales`     |  
+| **Évolution Mensuelle**  | Courbe des ventes sur 30 jours                 | `sales.sale_date`           |  
+
+### **2. Implémentation avec Streamlit**  
+*(Alternative légère à Power BI, 100% Python)*  
+
+```python
+# dashboard.py
+import streamlit as st
+import sqlite3
+import pandas as pd
+import plotly.express as px
+
+# Connexion à la base
+conn = sqlite3.connect('data/sales.db')
+
+# CA Total
+total_revenue = pd.read_sql("SELECT SUM(amount) FROM sales", conn).iloc[0,0]
+
+# Top Produits
+product_sales = pd.read_sql('''
+  SELECT p.name, SUM(s.amount) as revenue 
+  FROM sales s JOIN products p ON s.product_id = p.id 
+  GROUP BY p.name ORDER BY revenue DESC LIMIT 5
+''', conn)
+
+# Dashboard Streamlit
+st.title("📈 Dashboard des Ventes")
+st.metric("CA Total", f"€{total_revenue:,.2f}")
+
+col1, col2 = st.columns(2)
+with col1:
+    st.header("Top 5 Produits")
+    fig = px.bar(product_sales, x="name", y="revenue")
+    st.plotly_chart(fig, use_container_width=True)
+
+with col2:
+    st.header("Ventes par Région")
+    region_data = pd.read_sql('''
+      SELECT st.region, SUM(s.amount) as revenue 
+      FROM sales s JOIN stores st ON s.store_id = st.id 
+      GROUP BY st.region
+    ''', conn)
+    fig = px.pie(region_data, values="revenue", names="region")
+    st.plotly_chart(fig, use_container_width=True)
+```
+
+---
+
+## **⏳ Analyses Avancées (Séries Temporelles & Prévisions)**  
+
+### **1. Analyse des Tendances avec Python**  
+```python
+# timeseries_analysis.py
+import pandas as pd
+from statsmodels.tsa.arima.model import ARIMA
+
+# Chargement des données
+df = pd.read_sql('''
+  SELECT sale_date, SUM(amount) as daily_revenue 
+  FROM sales GROUP BY sale_date ORDER BY sale_date
+''', conn)
+
+# Conversion en série temporelle
+df['sale_date'] = pd.to_datetime(df['sale_date'])
+df.set_index('sale_date', inplace=True)
+
+# Modèle ARIMA pour prévision
+model = ARIMA(df, order=(5,1,0))
+model_fit = model.fit()
+forecast = model_fit.forecast(steps=7)  # Prévision 7 jours
+
+print("🔮 Prévisions pour la semaine prochaine:")
+print(forecast)
+```
+
+### **2. Résultats des Prévisions**  
+| Date       | Prévision (€) |  
+|------------|--------------:|  
+| 2023-12-01 | 28,450        |  
+| 2023-12-02 | 29,120        |  
+| 2023-12-03 | 27,890        |  
+| ...        | ...           |  
+
+---
+
+## **🚀 Architecture Finale (Mise à Jour)**  
+
+```mermaid
+graph TD
+    A[Service Scripts] -->|Données brutes| B[(SQLite)]
+    B -->|Données nettoyées| C[Analyse Temporelle]
+    C -->|Prévisions| D[Dashboard Streamlit]
+    D -->|Visualisation| E[Utilisateurs Métiers]
+```
