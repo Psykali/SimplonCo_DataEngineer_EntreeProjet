@@ -1,5 +1,5 @@
 # SimplonCo_DataEngineer_Projet : Analyse des Ventes pour une PME  
-
+ 
 ## **Aperçu du Projet**  
 Ce projet consiste à créer une architecture à deux services pour analyser les données de ventes d'une petite et moyenne entreprise (PME). L'objectif est d'aider le client à comprendre la dynamique des ventes dans le temps et par région pour améliorer sa prise de décision stratégique.  
 
