@@ -1,0 +1,10 @@
++-------------+       +-------------+       +-------------+
+|   Products  |       |    Sales    |       |   Stores    |
++-------------+       +-------------+       +-------------+
+| PK: id      |<----->| PK: id      |<----->| PK: id      |
+| name        |       | product_id  |       | city        |
+| price       |       | store_id    |       | region      |
+| category    |       | sale_date   |       | address     |
++-------------+       | quantity    |       +-------------+
+                      | amount      |
+                      +-------------+

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  script_service:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db_service
+    volumes:
+      - .:/app
+
+  db_service:
+    image: nouchka/sqlite3
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
